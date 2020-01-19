@@ -1,5 +1,3 @@
-import codecs
-
 from lxml import html, etree
 from io import StringIO
 
