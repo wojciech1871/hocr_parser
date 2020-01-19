@@ -1,5 +1,11 @@
+import codecs
+
 from lxml import html, etree
 from io import StringIO
+
+from WordMonthExtractor import WordMonthExtractor
+from HalfYearExtractor import HalfYearExtractor
+from FromToExtractor import FromToExtractor
 
 
 class HocrParser:
@@ -7,9 +13,11 @@ class HocrParser:
     def __init__(self):
         self.doc = None
         self.root = None
+        self.parsed_document = None
+
 
     def read_file(self, path):
-        with open(path, encoding='utf8') as file:
+        with open(path, 'r', encoding='utf-8', errors='ignore') as file:
             lines = file.readlines()
             first_line_i = 0
             for i, line in enumerate(lines):
@@ -22,24 +30,44 @@ class HocrParser:
             self.root = self.doc.getroot()
             del lines
 
+
     def parse_(self):
         document = []
-        pages = [page for page in self.root[1] if page.attrib.get('class', "") == 'ocr_page']
+        pages = [page for page in next(x for x in self.root if x.tag == 'body') if page.attrib.get('class', "") == 'ocr_page']
         for page in pages:
             page_l = []
             lines = [line for line in page if line.attrib.get('class', "") == 'ocrx_line']
-            for i, line in enumerate(lines):
+            for _, line in enumerate(lines):
                 words = [word.text for word in line if
                          word.attrib.get('class', "") == 'ocrx_word' and type(word.text) == str]
                 if words:
                     line_joined = " ".join(words)
                 page_l.append(line_joined)
             document.append(page_l)
+        self.parsed_document = document
         return document
 
 
-    ####### Example usage: #######
+    def get_dates(self):
+        text = " ".join(self.parsed_document[0][0:15])
+        
+        extractors = [
+            HalfYearExtractor(), 
+            WordMonthExtractor(), 
+            FromToExtractor()
+            ]
 
-    # parser = HocrParser()
-    # parser.read_file("./Sprawozdanie.hocr")
-    # document = parser.parse_()
+        for extractor in extractors:
+            dates = extractor.extract(text)
+            if dates is not None:
+                return dates[0].isoformat(), dates[1].isoformat()
+        
+        return None
+
+
+####### Example usage: #######
+# parser = HocrParser()
+# parser.read_file("./Sprawozdanie.hocr")
+# document = parser.parse_()
+# release_date = parser.get_release_date()
+# dates = parser.get_dates()
