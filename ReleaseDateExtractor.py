@@ -36,7 +36,7 @@ def polish_month_name_to_nr(string):
 
 def try_parsing_date(text):
     text = text.lower()
-    text = re.sub('[^0-9].*','', text)
+    text = re.sub('[^0-9.].*','', text)
     for fmt in ('%d%m%Y', '%d.%m.%Y', '%d/%m/%Y'):
         try:
             return datetime.strptime(text, fmt)
@@ -44,25 +44,25 @@ def try_parsing_date(text):
             pass
 
 def get_release_date(document):
-        results = []
-        pages = len(document)
-        for page in range(pages):
-            rows = len(document[page])
-            for row in range(rows):
-                date_search = re.search('[A-Z].*(,{1}|,{1}\s+dnia)\s+([0-3][0-9].*(styczeń|stycznia|luty|lutego|marzec|marca|kwiecień|kwietnia|maj|maja|czerwiec|czerwca|lipiec|lipca|sierpień|sierpnia|wrzesień|września|październik|października|listopad|listopada|grudzień|grudnia|[0-9]).*[12][0][0-1][0-9])',self.parsed_document[page][row], re.IGNORECASE)
-                if date_search:
-                    results.append(date_search.group(2))
+    results = []
+    pages = len(document)
+    for page in range(pages):
+        rows = len(document[page])
+        for row in range(rows):
+            date_search = re.search('[A-Z].*(,{1}|,{1}\s+dnia)\s+([0-3][0-9].*(styczeń|stycznia|luty|lutego|marzec|marca|kwiecień|kwietnia|maj|maja|czerwiec|czerwca|lipiec|lipca|sierpień|sierpnia|wrzesień|września|październik|października|listopad|listopada|grudzień|grudnia|[0-9]).*[12][0][0-1][0-9])',document[page][row], re.IGNORECASE)
+            if date_search:
+                results.append(date_search.group(2))
 
-        keys=Counter(results).keys() # equals to list(set(words))
-        counts=Counter(results).values() # counts the elements' frequency
-        if len(keys) != 0:
-            date = list(keys)[np.argmax(counts)]
-            numeric_date = polish_month_name_to_nr(date)
-            timestamp_date = try_parsing_date(numeric_date)
-            if timestamp_date is not None:
-                formated_date = timestamp_date.strftime("%d-%m-%Y")
-            else:
-                formated_date = None
+    keys=Counter(results).keys() # equals to list(set(words))
+    counts=Counter(results).values() # counts the elements' frequency
+    if len(keys) != 0:
+        date = list(keys)[np.argmax(counts)]
+        numeric_date = polish_month_name_to_nr(date)
+        timestamp_date = try_parsing_date(numeric_date)
+        if timestamp_date is not None:
+            formated_date = timestamp_date.strftime("%Y-%m-%d")
         else:
             formated_date = None
-        return formated_date
+    else:
+        formated_date = None
+    return formated_date
