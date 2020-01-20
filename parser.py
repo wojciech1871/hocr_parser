@@ -4,7 +4,7 @@ from io import StringIO
 from WordMonthExtractor import WordMonthExtractor
 from HalfYearExtractor import HalfYearExtractor
 from FromToExtractor import FromToExtractor
-
+from ReleaseDateExtractor import get_release_date
 
 class HocrParser:
 
@@ -45,6 +45,8 @@ class HocrParser:
         self.parsed_document = document
         return document
 
+    def get_release_date(self):
+        return get_release_date(self.parsed_document)
 
     def get_dates(self):
         text = " ".join(self.parsed_document[0][0:15])
@@ -61,7 +63,6 @@ class HocrParser:
                 return dates[0].isoformat(), dates[1].isoformat()
         
         return None
-
 
 ####### Example usage: #######
 # parser = HocrParser()
