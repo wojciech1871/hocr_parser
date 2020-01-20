@@ -64,7 +64,6 @@ class HocrParser:
         
         return None
 
-
 ####### Example usage: #######
 # parser = HocrParser()
 # parser.read_file("./Sprawozdanie.hocr")
