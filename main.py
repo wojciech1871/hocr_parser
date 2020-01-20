@@ -21,7 +21,7 @@ for id_folder in ids_folders:
         files_dict[id_folder] = hocr_file
 
         # Parse file
-        parser=HocrParser()
+        parser = HocrParser()
         parser.read_file(os.path.join(id_folder_path, hocr_file))
         document = parser.parse_()        
         
@@ -43,10 +43,10 @@ release_date_df = pd.DataFrame.from_dict(release_date_dict, orient='index', colu
 release_date_df['index'] = release_date_df['index'].astype('int64')
 
 period_from_df = pd.DataFrame.from_dict(period_from_dict, orient='index', columns=['period_from_extracted']).reset_index()
-period_from_df['index'] = release_date_df['index'].astype('int64')
+period_from_df['index'] = period_from_df['index'].astype('int64')
 
 period_to_df = pd.DataFrame.from_dict(period_to_dict, orient='index', columns=['period_to_extracted']).reset_index()
-period_to_df['index'] = release_date_df['index'].astype('int64')
+period_to_df['index'] = period_to_df['index'].astype('int64')
 
 true_dates = pd.read_csv(TRUE_VALUES_PATH, sep =';')
 
