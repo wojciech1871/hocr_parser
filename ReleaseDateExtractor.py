@@ -1,6 +1,5 @@
 import numpy as np
 import re
-os.chdir('C:\\Users\\tomas\\Downloads\\NLP\\PADT-1\\proj-2-poleval\\')
 from collections import Counter
 from datetime import datetime
 
