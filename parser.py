@@ -1,10 +1,10 @@
 from lxml import html, etree
 from io import StringIO
 
-from WordMonthExtractor import WordMonthExtractor
-from HalfYearExtractor import HalfYearExtractor
-from FromToExtractor import FromToExtractor
-from ReleaseDateExtractor import get_release_date
+from .WordMonthExtractor import WordMonthExtractor
+from .HalfYearExtractor import HalfYearExtractor
+from .FromToExtractor import FromToExtractor
+from .ReleaseDateExtractor import get_release_date
 
 class HocrParser:
 
