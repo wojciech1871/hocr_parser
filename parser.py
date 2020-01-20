@@ -48,6 +48,7 @@ class HocrParser:
 
     def get_dates(self):
         text = " ".join(self.parsed_document[0][0:15])
+        text = text.lower()
         
         extractors = [
             HalfYearExtractor(), 
@@ -65,7 +66,8 @@ class HocrParser:
 
 ####### Example usage: #######
 # parser = HocrParser()
-# parser.read_file("./Sprawozdanie.hocr")
+# parser.read_file("./data/contest/train/reports/208910/ZMR_PSr_2012_SPRAWOZDANIE_ZARZADU.hocr")
+# parser.read_file("./data/contest/train/reports/15988/rozszerzone_skonsolidowane_sprawozdanie__finansowe_Grupy_Kapitalowej_ProchemSA_na_30.06.2005.hocr")
 # document = parser.parse_()
 # release_date = parser.get_release_date()
 # dates = parser.get_dates()

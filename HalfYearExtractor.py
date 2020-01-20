@@ -6,7 +6,7 @@ from datetime import date
 class HalfYearExtractor:
 
     def __init__(self):
-        self.regex = r'(?P<half_year_number>(?:I{1,2})|(?:pierwsze|drugie))\s+p[óÓ][łŁ]rocz[eu]\s+(?P<year>\d{4})'
+        self.regex = r'(?P<half_year_number>(?:I{1,2})|(?:pierwsze|drugie)|(?:i|ii)|(?:1|2))\s+p[óÓ][łŁ]rocz[eu]\s+(?P<year>\d{4})'
 
 
     def extract(self, text):
