@@ -1,5 +1,6 @@
 import os
 import pandas as pd
+from tqdm import tqdm
 from parser import HocrParser
 
 DOCUMENTS_PATH = "./contest/test/reports/"
@@ -12,7 +13,7 @@ period_to_dict = {}
 
 ids_folders = os.listdir(DOCUMENTS_PATH)
 ids_folders = [d for d in ids_folders if os.path.isdir(os.path.join(DOCUMENTS_PATH,d))]
-for id_folder in ids_folders:
+for id_folder in tqdm(ids_folders):
     id_folder_path = os.path.join(DOCUMENTS_PATH, id_folder)
     files = os.listdir(id_folder_path)
     hocr_file = [f for f in files if os.path.isfile(os.path.join(id_folder_path, f)) and f.endswith(".hocr")]
