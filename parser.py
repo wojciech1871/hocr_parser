@@ -1,10 +1,11 @@
 from lxml import html, etree
 from io import StringIO
 
-from .WordMonthExtractor import WordMonthExtractor
-from .HalfYearExtractor import HalfYearExtractor
-from .FromToExtractor import FromToExtractor
-from .ReleaseDateExtractor import get_release_date
+from WordMonthExtractor import WordMonthExtractor
+from HalfYearExtractor import HalfYearExtractor
+from FromToExtractor import FromToExtractor
+from ReleaseDateExtractor import get_release_date
+from CompanyAddressExtractor import get_company_address_info
 
 class HocrParser:
 
@@ -64,6 +65,9 @@ class HocrParser:
                 return dates[0].isoformat(), dates[1].isoformat()
         
         return None
+    
+    def get_company_address_info(self):
+        return get_company_address_info(self.parsed_document)
 
 ####### Example usage: #######
 # parser = HocrParser()
