@@ -10,6 +10,8 @@ files_dict = {}
 release_date_dict = {}
 period_from_dict = {}
 period_to_dict = {}
+address_info_dict = {}
+
 
 ids_folders = os.listdir(DOCUMENTS_PATH)
 ids_folders = [d for d in ids_folders if os.path.isdir(os.path.join(DOCUMENTS_PATH,d))]
@@ -34,31 +36,51 @@ for id_folder in tqdm(ids_folders):
         dates = parser.get_dates()
         period_from_dict[id_folder] = dates[0]
         period_to_dict[id_folder] = dates[1]
+
+        # Add address data to dicts
+        address_info_dict[id_folder] = parser.get_company_address_info()
     
     except Exception as e:
         continue
         
         
 # Tests
-release_date_df = pd.DataFrame.from_dict(release_date_dict, orient='index', columns=['drawing_date_extracted']).reset_index()
-release_date_df['index'] = release_date_df['index'].astype('int64')
+def print_acc(df, orig_col_name, extracted_col_name, print_name):
+    acc = (df.loc[:, orig_col_name] == df.loc[:, extracted_col_name]).sum() / df.shape[0]
+    print("%s accuracy: %1.2f" % (print_name, acc))
 
-period_from_df = pd.DataFrame.from_dict(period_from_dict, orient='index', columns=['period_from_extracted']).reset_index()
-period_from_df['index'] = period_from_df['index'].astype('int64')
 
-period_to_df = pd.DataFrame.from_dict(period_to_dict, orient='index', columns=['period_to_extracted']).reset_index()
-period_to_df['index'] = period_to_df['index'].astype('int64')
+def create_subdf(data_dict, colnames):
+    if isinstance(colnames, str):
+        colnames = [colnames]
+    df = pd.DataFrame.from_dict(data_dict, orient="index", columns=colnames).reset_index()
+    df["index"] = df.loc[:, "index"].astype("int64")
+    return df
 
-true_dates = pd.read_csv(TRUE_VALUES_PATH, sep =';')
 
-true_dates = pd.merge(true_dates, release_date_df, left_on='id', right_on='index', how='left')
-true_dates = pd.merge(true_dates, period_from_df, left_on='id', right_on='index', how='left')
-true_dates = pd.merge(true_dates, period_to_df, left_on='id', right_on='index', how='left')
+# Reading the reference data
+reference_data = pd.read_csv(TRUE_VALUES_PATH, sep =';')
 
-drawing_date_accuracy = sum(true_dates['drawing_date'] == true_dates['drawing_date_extracted'])/true_dates.shape[0]
-period_from_accuracy = sum(true_dates['period_from'] == true_dates['period_from_extracted'])/true_dates.shape[0]
-period_to_accuracy = sum(true_dates['period_to'] == true_dates['period_to_extracted'])/true_dates.shape[0]
 
-print(str.format("Drawing date accuracy: " + "%1.2f" % drawing_date_accuracy), end="\n")
-print(str.format("Period from accuracy: " + "%1.2f" % period_from_accuracy), end="\n")
-print(str.format("Period to accuracy: " + "%1.2f" % period_to_accuracy), end="\n")
+# Creating the sub-dataframes
+release_date_df = create_subdf(release_date_dict, ["drawing_date_extracted"])
+period_from_df = create_subdf(period_from_dict, ["period_from_extracted"])
+period_to_df = create_subdf(period_to_dict, ["period_to_extracted"])
+address_info_df = create_subdf(address_info_dict, [cn + "_extracted" for cn in ("postal_code", "city", "street", "street_no")])
+
+
+# Merging the sub-dataframes to the reference data
+reference_data = pd.merge(reference_data, release_date_df, left_on='id', right_on='index', how='left')
+reference_data = pd.merge(reference_data, period_from_df, left_on='id', right_on='index', how='left')
+reference_data = pd.merge(reference_data, period_to_df, left_on='id', right_on='index', how='left')
+reference_data = pd.merge(reference_data, address_info_df, left_on='id', right_on='index', how='left')
+
+
+# Printing accuracy
+print_acc(reference_data, 'drawing_date', 'drawing_date_extracted', 'Drawing date')
+print_acc(reference_data, 'period_from', 'period_from_extracted', 'Period from')
+print_acc(reference_data, 'period_to', 'period_to_extracted', 'Period to')
+print_acc(reference_data, 'postal_code', 'postal_code_extracted', 'Postal code')
+print_acc(reference_data, 'city', 'city_extracted', 'City')
+print_acc(reference_data, 'street', 'street_extracted', 'Street')
+print_acc(reference_data, 'street_no', 'street_no_extracted', 'Street no.')
