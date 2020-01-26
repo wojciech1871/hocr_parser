@@ -11,6 +11,7 @@ release_date_dict = {}
 period_from_dict = {}
 period_to_dict = {}
 address_info_dict = {}
+members_dict = {}
 
 
 ids_folders = os.listdir(DOCUMENTS_PATH)
@@ -39,6 +40,9 @@ for id_folder in tqdm(ids_folders):
 
         # Add address data to dicts
         address_info_dict[id_folder] = parser.get_company_address_info()
+
+        # Add members data to dict
+        members_dict[id_folder] = parser.get_members()
     
     except Exception as e:
         continue
@@ -59,7 +63,7 @@ def create_subdf(data_dict, colnames):
 
 
 # Reading the reference data
-reference_data = pd.read_csv(TRUE_VALUES_PATH, sep =';')
+reference_data = pd.read_csv(TRUE_VALUES_PATH, sep=';')
 
 
 # Creating the sub-dataframes
@@ -67,6 +71,7 @@ release_date_df = create_subdf(release_date_dict, ["drawing_date_extracted"])
 period_from_df = create_subdf(period_from_dict, ["period_from_extracted"])
 period_to_df = create_subdf(period_to_dict, ["period_to_extracted"])
 address_info_df = create_subdf(address_info_dict, [cn + "_extracted" for cn in ("postal_code", "city", "street", "street_no")])
+members_df = create_subdf(members_dict, ["people_extracted"])
 
 
 # Merging the sub-dataframes to the reference data
@@ -74,6 +79,7 @@ reference_data = pd.merge(reference_data, release_date_df, left_on='id', right_o
 reference_data = pd.merge(reference_data, period_from_df, left_on='id', right_on='index', how='left')
 reference_data = pd.merge(reference_data, period_to_df, left_on='id', right_on='index', how='left')
 reference_data = pd.merge(reference_data, address_info_df, left_on='id', right_on='index', how='left')
+reference_data = pd.merge(reference_data, members_df, left_on='id', right_on='index', how='left')
 
 
 # Printing accuracy
@@ -84,3 +90,5 @@ print_acc(reference_data, 'postal_code', 'postal_code_extracted', 'Postal code')
 print_acc(reference_data, 'city', 'city_extracted', 'City')
 print_acc(reference_data, 'street', 'street_extracted', 'Street')
 print_acc(reference_data, 'street_no', 'street_no_extracted', 'Street no.')
+print_acc(reference_data, 'people', 'people_extracted', 'People')
+

@@ -6,6 +6,7 @@ from HalfYearExtractor import HalfYearExtractor
 from FromToExtractor import FromToExtractor
 from ReleaseDateExtractor import get_release_date
 from CompanyAddressExtractor import get_company_address_info
+from MembersExtractor import get_members
 
 class HocrParser:
 
@@ -28,7 +29,6 @@ class HocrParser:
             self.doc = etree.parse(StringIO(xml_string), parser)
             self.root = self.doc.getroot()
             del lines
-
 
     def parse_(self):
         document = []
@@ -68,6 +68,9 @@ class HocrParser:
     
     def get_company_address_info(self):
         return get_company_address_info(self.parsed_document)
+
+    def get_members(self):
+        return get_members(self.parsed_document)
 
 ####### Example usage: #######
 # parser = HocrParser()
